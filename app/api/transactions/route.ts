@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 
-const transactionSchema = z.object({
+const createSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]),
   amount: z.number().positive("Сумма должна быть положительной"),
   date: z.string(),
@@ -21,26 +22,70 @@ export async function GET(req: Request) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { searchParams } = new URL(req.url);
     const orgId = session.user.organizationId;
-    const limit = parseInt(searchParams.get("limit") ?? "50");
+    const { searchParams } = new URL(req.url);
+
+    const page = Math.max(1, Number(searchParams.get("page") ?? 1));
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") ?? 20)));
     const type = searchParams.get("type") as "INCOME" | "EXPENSE" | "TRANSFER" | null;
     const accountId = searchParams.get("accountId");
     const categoryId = searchParams.get("categoryId");
+    const projectId = searchParams.get("projectId");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
+    const search = searchParams.get("search");
+    const isPlanned = searchParams.get("isPlanned");
 
-    const transactions = await prisma.transaction.findMany({
-      where: {
-        organizationId: orgId,
-        ...(type && { type }),
-        ...(accountId && { accountId }),
-        ...(categoryId && { categoryId }),
+    const where: Prisma.TransactionWhereInput = {
+      organizationId: orgId,
+      ...(type && { type }),
+      ...(accountId && { accountId }),
+      ...(categoryId && { categoryId }),
+      ...(projectId && { projectId }),
+      ...(isPlanned !== null && { isPlanned: isPlanned === "true" }),
+      ...(dateFrom || dateTo
+        ? {
+            date: {
+              ...(dateFrom && { gte: new Date(dateFrom) }),
+              ...(dateTo && { lte: new Date(dateTo + "T23:59:59") }),
+            },
+          }
+        : {}),
+      ...(search
+        ? {
+            OR: [
+              { description: { contains: search, mode: "insensitive" } },
+              { counterparty: { name: { contains: search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
+    };
+
+    const [transactions, total] = await prisma.$transaction([
+      prisma.transaction.findMany({
+        where,
+        include: {
+          account: { select: { id: true, name: true, currency: true } },
+          category: { select: { id: true, name: true, color: true } },
+          project: { select: { id: true, name: true } },
+          counterparty: { select: { id: true, name: true } },
+        },
+        orderBy: { date: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      transactions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      include: { category: true, account: true, project: true, counterparty: true },
-      orderBy: { date: "desc" },
-      take: limit,
     });
-
-    return NextResponse.json(transactions);
   } catch (error) {
     console.error("GET /api/transactions error:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
@@ -53,7 +98,7 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const parsed = transactionSchema.safeParse(body);
+    const parsed = createSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -81,29 +126,34 @@ export async function POST(req: Request) {
           type: data.type,
           amount: data.amount,
           date: new Date(data.date),
-          categoryId: data.categoryId || null,
-          projectId: data.projectId || null,
-          counterpartyId: data.counterpartyId || null,
-          description: data.description || null,
+          categoryId: data.categoryId ?? null,
+          projectId: data.projectId ?? null,
+          counterpartyId: data.counterpartyId ?? null,
+          description: data.description ?? null,
           tags: data.tags ?? [],
           isPlanned: data.isPlanned ?? false,
+          currency: account.currency,
         },
-        include: { category: true, account: true },
+        include: {
+          category: true,
+          account: true,
+          project: true,
+          counterparty: true,
+        },
       });
 
-      // Update account balance
+      // Update account balance for confirmed transactions
       if (!data.isPlanned) {
-        const balanceDelta =
+        const delta =
           data.type === "INCOME"
             ? data.amount
             : data.type === "EXPENSE"
             ? -data.amount
             : 0;
-
-        if (balanceDelta !== 0) {
+        if (delta !== 0) {
           await tx.account.update({
             where: { id: data.accountId },
-            data: { balance: { increment: balanceDelta } },
+            data: { balance: { increment: delta } },
           });
         }
       }

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TransactionsClient } from "./transactions-client";
+import { TransactionsPageClient } from "./transactions-page-client";
 
 export default async function TransactionsPage() {
   const session = await auth();
@@ -8,18 +8,7 @@ export default async function TransactionsPage() {
 
   const orgId = session.user.organizationId;
 
-  const [transactions, accounts, categories] = await Promise.all([
-    prisma.transaction.findMany({
-      where: { organizationId: orgId },
-      orderBy: { date: "desc" },
-      take: 50,
-      include: {
-        category: true,
-        account: true,
-        project: true,
-        counterparty: true,
-      },
-    }),
+  const [accounts, categories, projects] = await Promise.all([
     prisma.account.findMany({
       where: { organizationId: orgId, isArchived: false },
       orderBy: { name: "asc" },
@@ -28,16 +17,22 @@ export default async function TransactionsPage() {
       where: { organizationId: orgId },
       orderBy: { name: "asc" },
     }),
+    prisma.project.findMany({
+      where: { organizationId: orgId, status: "ACTIVE" },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   return (
-    <TransactionsClient
-      initialTransactions={transactions.map((t) => ({
-        ...t,
-        amount: Number(t.amount),
+    <TransactionsPageClient
+      accounts={accounts.map((a) => ({ id: a.id, name: a.name, balance: Number(a.balance) }))}
+      categories={categories.map((c) => ({
+        id: c.id,
+        name: c.name,
+        type: c.type,
+        parentId: c.parentId,
       }))}
-      accounts={accounts.map((a) => ({ ...a, balance: Number(a.balance) }))}
-      categories={categories}
+      projects={projects.map((p) => ({ id: p.id, name: p.name }))}
     />
   );
 }
