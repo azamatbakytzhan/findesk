@@ -28,6 +28,12 @@ const settingsItems = [
     href: "/settings/integrations",
     icon: Zap,
   },
+  {
+    title: "Автоматизация",
+    description: "Правила автоматической категоризации транзакций",
+    href: "/settings/automation",
+    icon: Zap,
+  },
 ];
 
 export default async function SettingsPage() {

@@ -340,6 +340,118 @@ async function main() {
 
   console.log("✅ Бюджеты созданы");
 
+  // Automation rules
+  await prisma.automationRule.deleteMany({ where: { organizationId: org.id } });
+  await prisma.automationRule.createMany({
+    data: [
+      {
+        organizationId: org.id,
+        name:           "Зарплата",
+        priority:       10,
+        isActive:       true,
+        conditionLogic: "OR",
+        conditions: [
+          { field: "description", operator: "contains", value: "зарплата" },
+          { field: "description", operator: "contains", value: "salary"   },
+        ],
+        actions: [{ field: "categoryId", value: expenseCategories[0]!.id }],
+      },
+      {
+        organizationId: org.id,
+        name:           "Аренда офиса",
+        priority:       9,
+        isActive:       true,
+        conditionLogic: "OR",
+        conditions: [{ field: "description", operator: "contains", value: "аренда" }],
+        actions: [{ field: "categoryId", value: expenseCategories[1]!.id }],
+      },
+      {
+        organizationId: org.id,
+        name:           "Реклама и маркетинг",
+        priority:       8,
+        isActive:       true,
+        conditionLogic: "OR",
+        conditions: [
+          { field: "description", operator: "contains", value: "реклама"   },
+          { field: "description", operator: "contains", value: "маркетинг" },
+        ],
+        actions: [{ field: "categoryId", value: expenseCategories[2]!.id }],
+      },
+    ],
+  });
+
+  console.log("✅ Правила автоматизации созданы");
+
+  // Planned transactions (for debts page)
+  const futureDate1 = new Date(); futureDate1.setDate(futureDate1.getDate() + 5);
+  const futureDate2 = new Date(); futureDate2.setDate(futureDate2.getDate() + 12);
+  const overdueDate = new Date(); overdueDate.setDate(overdueDate.getDate() - 3);
+
+  await prisma.transaction.createMany({
+    data: [
+      // Receivables (unconfirmed income = нам должны)
+      {
+        organizationId: org.id,
+        accountId:      mainAccount.id,
+        type:           "INCOME",
+        amount:         750000,
+        date:           futureDate1,
+        categoryId:     incomeCategories[0]!.id,
+        counterpartyId: counterparties[0]!.id,
+        description:    "Оплата по счёту №A-2025-01",
+        currency:       "KZT",
+        isConfirmed:    false,
+        isPlanned:      true,
+        tags:           [],
+      },
+      {
+        organizationId: org.id,
+        accountId:      mainAccount.id,
+        type:           "INCOME",
+        amount:         320000,
+        date:           overdueDate,
+        categoryId:     incomeCategories[1]!.id,
+        counterpartyId: counterparties[0]!.id,
+        description:    "Консультационные услуги — просроченный платёж",
+        currency:       "KZT",
+        isConfirmed:    false,
+        isPlanned:      true,
+        tags:           [],
+      },
+      // Payables (unconfirmed expense = мы должны)
+      {
+        organizationId: org.id,
+        accountId:      mainAccount.id,
+        type:           "EXPENSE",
+        amount:         450000,
+        date:           futureDate2,
+        categoryId:     expenseCategories[1]!.id,
+        counterpartyId: counterparties[2]!.id,
+        description:    "Аренда офиса — следующий месяц",
+        currency:       "KZT",
+        isConfirmed:    false,
+        isPlanned:      true,
+        tags:           [],
+      },
+      {
+        organizationId: org.id,
+        accountId:      mainAccount.id,
+        type:           "EXPENSE",
+        amount:         280000,
+        date:           overdueDate,
+        categoryId:     expenseCategories[2]!.id,
+        counterpartyId: counterparties[1]!.id,
+        description:    "Маркетинговые услуги — просрочено",
+        currency:       "KZT",
+        isConfirmed:    false,
+        isPlanned:      true,
+        tags:           [],
+      },
+    ],
+  });
+
+  console.log("✅ Плановые транзакции (обязательства) созданы");
+
   console.log("\n🎉 Сидирование завершено!");
   console.log("\n📊 Тестовые данные:");
   console.log("   Организация: ТОО «Ромашка и Партнёры»");

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
+import { applyAutomationRules } from "@/lib/automation-engine";
 
 const createSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]),
@@ -160,6 +161,34 @@ export async function POST(req: Request) {
 
       return newTx;
     });
+
+    // Apply automation rules if no category was manually set
+    if (!data.categoryId) {
+      const rules = await prisma.automationRule.findMany({
+        where: { organizationId: orgId, isActive: true },
+        orderBy: { priority: "desc" },
+      });
+      const suggested = await applyAutomationRules(
+        {
+          description:     data.description,
+          amount:          data.amount,
+          accountId:       data.accountId,
+          counterpartyName: undefined,
+        },
+        rules
+      );
+      if (suggested.categoryId || suggested.projectId) {
+        await prisma.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            categoryId:  suggested.categoryId  ?? null,
+            projectId:   suggested.projectId   ?? null,
+            tags:        suggested.tags         ?? transaction.tags,
+            aiSuggested: true,
+          },
+        });
+      }
+    }
 
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
