@@ -45,6 +45,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           organizationId: user.organizationId,
           orgName: user.organization.name,
           role: user.role,
+          plan: user.organization.plan,
+          trialEndsAt: user.organization.trialEndsAt?.toISOString() ?? null,
         };
       },
     }),
@@ -56,6 +58,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.organizationId = (user as { organizationId: string }).organizationId;
         token.orgName = (user as { orgName: string }).orgName;
         token.role = (user as { role: string }).role;
+        token.plan = (user as { plan: string }).plan;
+        token.trialEndsAt = (user as { trialEndsAt: string | null }).trialEndsAt;
       }
       return token;
     },
@@ -65,6 +69,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.organizationId = token.organizationId as string;
         session.user.orgName = token.orgName as string;
         session.user.role = token.role as string;
+        session.user.plan = token.plan as string;
+        session.user.trialEndsAt = token.trialEndsAt as string | null;
       }
       return session;
     },

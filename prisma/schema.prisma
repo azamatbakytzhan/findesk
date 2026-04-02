@@ -17,16 +17,19 @@ model Organization {
   currency    String    @default("KZT")
   createdAt   DateTime  @default(now())
 
-  users           User[]
-  accounts        Account[]
-  transactions    Transaction[]
-  categories      Category[]
-  projects        Project[]
-  counterparties  Counterparty[]
-  budgets         Budget[]
-  automationRules AutomationRule[]
-  paymentRequests PaymentRequest[]
-  aiConversations AiConversation[]
+  users                User[]
+  accounts             Account[]
+  transactions         Transaction[]
+  categories           Category[]
+  projects             Project[]
+  counterparties       Counterparty[]
+  budgets              Budget[]
+  automationRules      AutomationRule[]
+  paymentRequests      PaymentRequest[]
+  aiConversations      AiConversation[]
+  invites              Invite[]
+  paymentHistory       PaymentHistory[]
+  notificationSettings NotificationSettings?
 }
 
 model User {
@@ -37,6 +40,7 @@ model User {
   passwordHash   String?
   role           UserRole @default(VIEWER)
   avatar         String?
+  telegramChatId String?
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
@@ -236,6 +240,45 @@ model AiConversation {
   messages       Json
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Invite {
+  id             String    @id @default(cuid())
+  organizationId String
+  email          String
+  role           UserRole  @default(VIEWER)
+  token          String    @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, email])
+}
+
+model PaymentHistory {
+  id             String   @id @default(cuid())
+  organizationId String
+  plan           Plan
+  amount         Decimal  @db.Decimal(15, 2)
+  currency       String   @default("KZT")
+  description    String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model NotificationSettings {
+  id                 String   @id @default(cuid())
+  organizationId     String   @unique
+  telegramChatId     String?
+  emailDigest        Boolean  @default(true)
+  telegramPayments   Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 }
