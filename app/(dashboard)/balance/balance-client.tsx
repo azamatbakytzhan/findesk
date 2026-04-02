@@ -259,6 +259,13 @@ export function BalanceClient() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {equityPoints.length === 0 || equityPoints.every((p) => p.equity === 0 && p.cash === 0) ? (
+            <div className="flex flex-col items-center justify-center h-[220px] text-gray-400">
+              <p className="text-sm font-medium">Нет данных для отображения</p>
+              <p className="text-xs mt-1">Добавьте транзакции, чтобы увидеть динамику капитала</p>
+            </div>
+          ) : (
+          <>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
               data={equityPoints}
@@ -310,6 +317,8 @@ export function BalanceClient() {
               Денежные средства
             </span>
           </div>
+          </>
+          )}
         </CardContent>
       </Card>
     </div>
