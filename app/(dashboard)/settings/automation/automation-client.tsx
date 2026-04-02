@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Plus, Trash2, Pencil, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Pencil, Zap, PlayCircle, Loader2 } from "lucide-react";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface Condition {
   field:    string;
@@ -33,6 +34,41 @@ interface Rule {
 
 interface Category { id: string; name: string; type: string }
 interface Project  { id: string; name: string }
+
+interface TestMatch {
+  id:          string;
+  date:        string;
+  type:        string;
+  amount:      number;
+  description: string | null;
+  account:     { name: string };
+  category:    { name: string } | null;
+}
+
+// Client-side condition evaluation mirrors automation-engine.ts
+function evalCondition(
+  c: Condition,
+  tx: { description: string | null; amount: number; accountId: string }
+): boolean {
+  const raw = (() => {
+    switch (c.field) {
+      case "description": return tx.description ?? "";
+      case "amount":      return String(tx.amount);
+      case "accountId":   return tx.accountId;
+      default:            return "";
+    }
+  })();
+  const fv = raw.toLowerCase();
+  const cv = c.value.toLowerCase();
+  switch (c.operator) {
+    case "contains":    return fv.includes(cv);
+    case "equals":      return fv === cv;
+    case "startsWith":  return fv.startsWith(cv);
+    case "greaterThan": return Number(raw) > Number(c.value);
+    case "lessThan":    return Number(raw) < Number(c.value);
+    default:            return false;
+  }
+}
 
 interface Props {
   categories: Category[];
@@ -78,8 +114,9 @@ export function AutomationClient({ categories, projects }: Props) {
   const [dialog,  setDialog]  = useState(false);
   const [editing, setEditing] = useState<Rule | null>(null);
   const [form,    setForm]    = useState({ ...EMPTY_RULE });
-  const [saving,  setSaving]  = useState(false);
-  const [testResult, setTestResult] = useState<null | { count: number }>(null);
+  const [saving,   setSaving]   = useState(false);
+  const [testing,  setTesting]  = useState(false);
+  const [testMatches, setTestMatches] = useState<TestMatch[] | null>(null);
 
   const fetchRules = useCallback(async () => {
     setLoading(true);
@@ -97,7 +134,7 @@ export function AutomationClient({ categories, projects }: Props) {
   const openCreate = () => {
     setEditing(null);
     setForm({ ...EMPTY_RULE, conditions: [{ ...EMPTY_CONDITION }], actions: [{ ...EMPTY_ACTION }] });
-    setTestResult(null);
+    setTestMatches(null);
     setDialog(true);
   };
 
@@ -111,8 +148,35 @@ export function AutomationClient({ categories, projects }: Props) {
       priority:       rule.priority,
       isActive:       rule.isActive,
     });
-    setTestResult(null);
+    setTestMatches(null);
     setDialog(true);
+  };
+
+  const handleTest = async () => {
+    const validConditions = form.conditions.filter((c) => c.value.trim());
+    if (!validConditions.length) return;
+    setTesting(true);
+    setTestMatches(null);
+    try {
+      const res  = await fetch("/api/transactions?limit=50&page=1");
+      const json = await res.json();
+      const txs  = (json.transactions ?? []) as Array<{
+        id: string; date: string; type: string; amount: number;
+        description: string | null; accountId: string;
+        account: { name: string }; category: { name: string } | null;
+      }>;
+
+      const matches = txs.filter((tx) => {
+        const logic = form.conditionLogic;
+        return logic === "OR"
+          ? validConditions.some((c)  => evalCondition(c, tx))
+          : validConditions.every((c) => evalCondition(c, tx));
+      });
+
+      setTestMatches(matches.slice(0, 10));
+    } finally {
+      setTesting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -472,7 +536,57 @@ export function AutomationClient({ categories, projects }: Props) {
             </div>
           </div>
 
-          <DialogFooter>
+          {/* Test results */}
+          {testMatches !== null && (
+            <div className="border rounded-lg overflow-hidden">
+              <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between">
+                <span className="text-xs font-semibold text-gray-700">
+                  {testMatches.length === 0
+                    ? "Нет совпадений среди последних 50 транзакций"
+                    : `Совпадает ${testMatches.length} из последних 50 транзакций:`}
+                </span>
+                <button
+                  onClick={() => setTestMatches(null)}
+                  className="text-xs text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+              {testMatches.length > 0 && (
+                <div className="divide-y max-h-48 overflow-y-auto">
+                  {testMatches.map((tx) => (
+                    <div key={tx.id} className="flex items-center justify-between px-3 py-2 text-xs">
+                      <div className="min-w-0">
+                        <p className="text-gray-700 truncate">{tx.description ?? "—"}</p>
+                        <p className="text-gray-400">
+                          {formatDate(new Date(tx.date))} · {tx.account.name}
+                          {tx.category && <span className="ml-1 text-gray-400">· {tx.category.name}</span>}
+                        </p>
+                      </div>
+                      <span className={`ml-3 font-semibold shrink-0 ${
+                        tx.type === "INCOME" ? "text-[#0E9F6E]" : "text-[#E02424]"
+                      }`}>
+                        {tx.type === "INCOME" ? "+" : "-"}{formatCurrency(tx.amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={handleTest}
+              disabled={testing || form.conditions.every((c) => !c.value.trim())}
+              className="mr-auto"
+            >
+              {testing
+                ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Проверяю…</>
+                : <><PlayCircle className="w-3.5 h-3.5 mr-1.5" /> Протестировать</>
+              }
+            </Button>
             <Button variant="outline" onClick={() => setDialog(false)}>Отмена</Button>
             <Button
               className="bg-[#1A56DB] hover:bg-[#1A56DB]/90"

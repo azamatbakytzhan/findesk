@@ -46,17 +46,28 @@ const ACCOUNT_TYPE_LABELS: Record<string, string> = {
   EWALLET: "Эл. кошелёк",
 };
 
+interface EquityPoint {
+  month:  string;
+  equity: number;
+  cash:   number;
+}
+
 export function BalanceClient() {
-  const [date,    setDate]    = useState(() => new Date().toISOString().slice(0, 10));
-  const [data,    setData]    = useState<BalanceData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [date,         setDate]         = useState(() => new Date().toISOString().slice(0, 10));
+  const [data,         setData]         = useState<BalanceData | null>(null);
+  const [equityPoints, setEquityPoints] = useState<EquityPoint[]>([]);
+  const [loading,      setLoading]      = useState(true);
 
   const fetchData = useCallback(async (d: string) => {
     setLoading(true);
     try {
-      const res  = await fetch(`/api/reports/balance?date=${d}`);
-      const json = await res.json();
-      setData(json);
+      const [balRes, histRes] = await Promise.all([
+        fetch(`/api/reports/balance?date=${d}`),
+        fetch("/api/reports/equity-history"),
+      ]);
+      const [balJson, histJson] = await Promise.all([balRes.json(), histRes.json()]);
+      setData(balJson);
+      setEquityPoints(histJson.points ?? []);
     } finally {
       setLoading(false);
     }
@@ -240,30 +251,65 @@ export function BalanceClient() {
         </Card>
       </div>
 
-      {/* Equity dynamics (simple 12-month chart placeholder with current value) */}
+      {/* Equity dynamics — 12 months */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">Собственный капитал</CardTitle>
+          <CardTitle className="text-base font-semibold">
+            Динамика собственного капитала (12 месяцев)
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={220}>
             <LineChart
-              data={[{ name: "Сейчас", equity }]}
+              data={equityPoints}
               margin={{ top: 4, right: 16, left: 10, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6B7280" }} />
+              <XAxis
+                dataKey="month"
+                axisLine={false} tickLine={false}
+                tick={{ fontSize: 11, fill: "#6B7280" }}
+              />
               <YAxis
-                axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }}
-                tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                axisLine={false} tickLine={false}
+                tick={{ fontSize: 11, fill: "#6B7280" }}
+                tickFormatter={(v) => `${(v / 1_000_000).toFixed(1)}M`}
               />
               <Tooltip
-                formatter={(v: number) => [formatCurrency(v), "Капитал"]}
+                formatter={(v: number, name: string) => [
+                  formatCurrency(v),
+                  name === "equity" ? "Капитал" : "Денежные средства",
+                ]}
                 contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
               />
-              <Line dataKey="equity" stroke="#1A56DB" strokeWidth={2} dot={{ r: 4, fill: "#1A56DB" }} />
+              <Line
+                dataKey="cash"
+                stroke="#CBD5E1"
+                strokeWidth={1.5}
+                strokeDasharray="4 4"
+                dot={false}
+                name="cash"
+              />
+              <Line
+                dataKey="equity"
+                stroke="#1A56DB"
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: "#1A56DB" }}
+                activeDot={{ r: 5 }}
+                name="equity"
+              />
             </LineChart>
           </ResponsiveContainer>
+          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 justify-center">
+            <span className="flex items-center gap-1.5">
+              <span className="w-5 h-0.5 bg-[#1A56DB] inline-block rounded" />
+              Собственный капитал
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-5 h-0.5 bg-gray-300 inline-block rounded" style={{ borderTop: "2px dashed #CBD5E1", background: "none" }} />
+              Денежные средства
+            </span>
+          </div>
         </CardContent>
       </Card>
     </div>

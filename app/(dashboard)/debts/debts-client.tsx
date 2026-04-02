@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { ChevronDown, ChevronRight, AlertTriangle, CreditCard, Bell } from "lucide-react";
+import { ChevronDown, ChevronRight, AlertTriangle, CreditCard, Bell, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DebtItem {
@@ -122,10 +122,39 @@ function GroupRow({
   );
 }
 
+type SortField = "name" | "total" | "date";
+type SortDir   = "asc" | "desc";
+
+function sortGroups(groups: CounterpartyGroup[], field: SortField, dir: SortDir) {
+  return [...groups].sort((a, b) => {
+    let cmp = 0;
+    if (field === "name")  cmp = a.name.localeCompare(b.name, "ru");
+    if (field === "total") cmp = a.total - b.total;
+    if (field === "date") {
+      const aMin = Math.min(...a.items.map((i) => new Date(i.date).getTime()));
+      const bMin = Math.min(...b.items.map((i) => new Date(i.date).getTime()));
+      cmp = aMin - bMin;
+    }
+    return dir === "asc" ? cmp : -cmp;
+  });
+}
+
+function sortItems(items: DebtItem[], field: SortField, dir: SortDir) {
+  return [...items].sort((a, b) => {
+    let cmp = 0;
+    if (field === "name")  cmp = (a.description ?? "").localeCompare(b.description ?? "", "ru");
+    if (field === "total") cmp = a.amount - b.amount;
+    if (field === "date")  cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+    return dir === "asc" ? cmp : -cmp;
+  });
+}
+
 export function DebtsClient() {
-  const [tab,     setTab]     = useState<"receivables" | "payables">("receivables");
-  const [data,    setData]    = useState<DebtsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [tab,      setTab]      = useState<"receivables" | "payables">("receivables");
+  const [data,     setData]     = useState<DebtsData | null>(null);
+  const [loading,  setLoading]  = useState(true);
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDir,   setSortDir]   = useState<SortDir>("asc");
 
   // Remind dialog
   const [remindDialog, setRemindDialog] = useState<{ group: CounterpartyGroup; item: DebtItem } | null>(null);
@@ -175,7 +204,23 @@ export function DebtsClient() {
     );
   }
 
-  const current = tab === "receivables" ? data?.receivables : data?.payables;
+  const rawCurrent = tab === "receivables" ? data?.receivables : data?.payables;
+
+  // Apply sorting to groups and their items
+  const current = rawCurrent
+    ? {
+        ...rawCurrent,
+        byCounterparty: sortGroups(rawCurrent.byCounterparty, sortField, sortDir).map((g) => ({
+          ...g,
+          items: sortItems(g.items, sortField, sortDir),
+        })),
+      }
+    : undefined;
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortField(field); setSortDir("asc"); }
+  };
 
   return (
     <div className="space-y-6">
@@ -209,7 +254,8 @@ export function DebtsClient() {
         />
       </div>
 
-      {/* Tabs */}
+      {/* Tabs + Sort */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
         {[
           { key: "receivables" as const, label: "Нам должны" },
@@ -226,6 +272,30 @@ export function DebtsClient() {
             {t.label}
           </button>
         ))}
+      </div>
+
+      {/* Sort controls */}
+      <div className="flex items-center gap-1 text-xs text-gray-500">
+        <ArrowUpDown className="w-3.5 h-3.5 mr-1" />
+        {(["date", "total", "name"] as SortField[]).map((f) => {
+          const labels: Record<SortField, string> = { date: "Дата", total: "Сумма", name: "Контрагент" };
+          const active = sortField === f;
+          return (
+            <button
+              key={f}
+              onClick={() => handleSort(f)}
+              className={cn(
+                "px-2.5 py-1 rounded border text-xs font-medium transition-colors",
+                active
+                  ? "border-[#1A56DB] text-[#1A56DB] bg-blue-50"
+                  : "border-gray-200 text-gray-500 hover:border-gray-400"
+              )}
+            >
+              {labels[f]}{active ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+            </button>
+          );
+        })}
+      </div>
       </div>
 
       {/* Content */}
