@@ -3,6 +3,18 @@
     {
       "path": "/api/digest/cron",
       "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/confirm-overdue",
+      "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/ai/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/digest/cron/route.ts": {
+      "maxDuration": 300
+    }
+  }
 }

@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Providers } from "@/app/providers";
 
 export const metadata: Metadata = {
-  title: "Findesk — Управленческий учёт",
-  description:
-    "Сервис управленческого финансового учёта для малого и среднего бизнеса",
+  title:       { default: "Findesk", template: "%s — Findesk" },
+  description: "Управленческий финансовый учёт для малого бизнеса Казахстана",
+  manifest:    "/manifest.webmanifest",
+  appleWebApp: {
+    capable:         true,
+    statusBarStyle:  "default",
+    title:           "Findesk",
+  },
+  formatDetection: { telephone: false },
+  openGraph: {
+    type:        "website",
+    siteName:    "Findesk",
+    title:       "Findesk — Финансовый учёт с ИИ-агентом",
+    description: "ДДС, ОПиУ, Баланс — автоматически. ИИ отвечает на вопросы по вашим финансам.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "Findesk",
+    description: "Финансовый учёт для бизнеса Казахстана",
+    images:      ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
@@ -15,8 +35,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <meta name="theme-color" content="#1A56DB" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
       <body style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" }}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
       </body>
     </html>

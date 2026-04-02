@@ -24,7 +24,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const navItems = [
   {
     label: "Дашборд",
-    href: "/",
+    href: "/dashboard",
     icon: LayoutDashboard,
   },
   {
