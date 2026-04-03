@@ -1,4 +1,5 @@
 import { AiChatPanel } from "@/components/ai/ai-chat-panel";
+import { PlanGate } from "@/components/plan-gate";
 
 export default function AiPage() {
   return (
@@ -10,7 +11,9 @@ export default function AiPage() {
         </p>
       </div>
       <div className="flex-1 min-h-0">
-        <AiChatPanel />
+        <PlanGate feature="aiAssistant">
+          <AiChatPanel />
+        </PlanGate>
       </div>
     </div>
   );

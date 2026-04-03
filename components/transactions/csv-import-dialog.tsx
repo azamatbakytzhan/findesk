@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 interface Account {
@@ -73,11 +73,7 @@ export function CsvImportDialog({ open, onOpenChange, accounts, onSuccess }: Pro
         setPreview(json.preview);
         setTotalRows(json.total);
       } catch (err) {
-        toast({
-          variant: "destructive",
-          title: "Ошибка разбора файла",
-          description: err instanceof Error ? err.message : "Проверьте формат CSV",
-        });
+        toast.error(err instanceof Error ? err.message : "Проверьте формат CSV");
       } finally {
         setIsPreviewLoading(false);
       }
@@ -106,17 +102,13 @@ export function CsvImportDialog({ open, onOpenChange, accounts, onSuccess }: Pro
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
 
-      toast({ title: `Импортировано ${json.imported} транзакций` });
+      toast.success(`Импортировано ${json.imported} транзакций`);
       onOpenChange(false);
       setFile(null);
       setPreview(null);
       onSuccess();
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка импорта",
-        description: err instanceof Error ? err.message : "Что-то пошло не так",
-      });
+      toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsImporting(false);
     }

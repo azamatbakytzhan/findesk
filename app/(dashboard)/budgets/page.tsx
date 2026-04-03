@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BudgetsClient } from "./budgets-client";
+import { PlanGate } from "@/components/plan-gate";
 
 export default async function BudgetsPage() {
   const session = await auth();
@@ -12,5 +13,9 @@ export default async function BudgetsPage() {
     select: { id: true, name: true, type: true },
   });
 
-  return <BudgetsClient categories={categories} />;
+  return (
+    <PlanGate feature="budgetModule">
+      <BudgetsClient categories={categories} />
+    </PlanGate>
+  );
 }

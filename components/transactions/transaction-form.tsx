@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
@@ -125,7 +125,7 @@ export function TransactionForm({
         throw new Error(json.error ?? "Ошибка сохранения");
       }
 
-      toast({ title: "Транзакция добавлена" });
+      toast.success("Транзакция добавлена");
       reset({
         type: "EXPENSE",
         date: new Date().toISOString().split("T")[0],
@@ -140,11 +140,7 @@ export function TransactionForm({
       onOpenChange(false);
       onSuccess();
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
-        description: err instanceof Error ? err.message : "Что-то пошло не так",
-      });
+      toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsSubmitting(false);
     }

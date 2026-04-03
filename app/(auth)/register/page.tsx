@@ -6,11 +6,12 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2, TrendingUp } from "lucide-react";
 
 const registerSchema = z.object({
@@ -46,19 +47,17 @@ export default function RegisterPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        toast({
-          variant: "destructive",
-          title: "Ошибка регистрации",
-          description: json.error ?? "Что-то пошло не так",
-        });
+        toast.error(json.error ?? "Что-то пошло не так");
         return;
       }
 
-      toast({
-        title: "Регистрация успешна!",
-        description: "Войдите в систему, используя ваши данные",
+      toast.success("Регистрация успешна! Выполняем вход...");
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
-      router.push("/login");
+      router.push("/dashboard");
     } finally {
       setIsLoading(false);
     }

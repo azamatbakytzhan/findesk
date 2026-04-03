@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { InlineCategorySelect } from "@/components/transactions/inline-category-select";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { Trash2, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export interface TransactionRow {
   id: string;
@@ -87,11 +87,11 @@ export function TransactionsTable({
     try {
       const res = await fetch(`/api/transactions/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Ошибка удаления");
-      toast({ title: "Транзакция удалена" });
+      toast.success("Транзакция удалена");
       setLocalData((prev) => prev.filter((t) => t.id !== id));
       onRefresh();
     } catch {
-      toast({ variant: "destructive", title: "Не удалось удалить транзакцию" });
+      toast.error("Не удалось удалить транзакцию");
     }
   }, [onRefresh]);
 
@@ -103,7 +103,7 @@ export function TransactionsTable({
     await Promise.all(
       ids.map((id) => fetch(`/api/transactions/${id}`, { method: "DELETE" }))
     );
-    toast({ title: `Удалено ${ids.length} транзакций` });
+    toast.success(`Удалено ${ids.length} транзакций`);
     setRowSelection({});
     onRefresh();
   }, [rowSelection, onRefresh]);

@@ -16,7 +16,7 @@ export default auth((req) => {
   }
 
   if (req.auth && (pathname === "/login" || pathname === "/register")) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();

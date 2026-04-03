@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { Users, Tag, Wallet, Zap, ArrowRight } from "lucide-react";
+import { Users, Tag, Wallet, Zap, ArrowRight, CreditCard, Bell, Building2 } from "lucide-react";
 
 const settingsItems = [
   {
@@ -15,6 +15,12 @@ const settingsItems = [
     description: "Настройка статей доходов и расходов",
     href: "/settings/categories",
     icon: Tag,
+  },
+  {
+    title: "Контрагенты",
+    description: "Клиенты, поставщики и сотрудники",
+    href: "/settings/counterparties",
+    icon: Building2,
   },
   {
     title: "Команда",
@@ -33,6 +39,18 @@ const settingsItems = [
     description: "Правила автоматической категоризации транзакций",
     href: "/settings/automation",
     icon: Zap,
+  },
+  {
+    title: "Тариф и оплата",
+    description: "Управление подпиской и история платежей",
+    href: "/settings/billing",
+    icon: CreditCard,
+  },
+  {
+    title: "Уведомления",
+    description: "Email и Telegram уведомления",
+    href: "/settings/notifications",
+    icon: Bell,
   },
 ];
 

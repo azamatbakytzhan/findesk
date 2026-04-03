@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Plus, Wallet, Banknote, CreditCard, Smartphone } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 interface Account {
@@ -85,16 +85,12 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
         throw new Error(json.error ?? "Ошибка");
       }
 
-      toast({ title: "Счёт создан" });
+      toast.success("Счёт создан");
       setDialogOpen(false);
       setForm({ name: "", type: "BANK", currency: "KZT", balance: "0", color: "#1A56DB" });
       router.refresh();
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
-        description: err instanceof Error ? err.message : "Что-то пошло не так",
-      });
+      toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsSubmitting(false);
     }

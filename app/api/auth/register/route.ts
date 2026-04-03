@@ -40,6 +40,7 @@ export async function POST(req: Request) {
           name: orgName,
           currency: "KZT",
           timezone: "Asia/Almaty",
+          trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
         },
       });
 

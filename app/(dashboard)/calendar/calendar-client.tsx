@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatCurrency } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   AlertTriangle, CheckCircle, CalendarDays,
   ChevronLeft, ChevronRight, ArrowUp, ArrowDown,
@@ -93,20 +93,20 @@ export function CalendarClient() {
         body: JSON.stringify({ isConfirmed: true }),
       });
       if (!res.ok) throw new Error();
-      toast({ title: "Операция подтверждена", description: `${formatCurrency(tx.amount)} зачислены на счёт` });
+      toast.success("Операция подтверждена", { description: `${formatCurrency(tx.amount)} зачислены на счёт` });
       void load();
     } catch {
-      toast({ variant: "destructive", title: "Не удалось подтвердить операцию" });
+      toast.error("Не удалось подтвердить операцию");
     }
   };
 
   const handleDelete = async (txId: string) => {
     try {
       await fetch(`/api/transactions/${txId}`, { method: "DELETE" });
-      toast({ title: "Плановая операция удалена" });
+      toast.success("Плановая операция удалена");
       void load();
     } catch {
-      toast({ variant: "destructive", title: "Ошибка" });
+      toast.error("Ошибка");
     }
   };
 

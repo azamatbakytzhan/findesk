@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2, TrendingUp } from "lucide-react";
 
 const loginSchema = z.object({
@@ -43,11 +43,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast({
-          variant: "destructive",
-          title: "Ошибка входа",
-          description: "Неверный email или пароль",
-        });
+        toast.error("Неверный email или пароль");
       } else {
         router.push("/");
         router.refresh();
