@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     type:        "website",
     siteName:    "Findesk",
+    locale:      "ru_RU",
     title:       "Findesk — Финансовый учёт с ИИ-агентом",
     description: "ДДС, ОПиУ, Баланс — автоматически. ИИ отвечает на вопросы по вашим финансам.",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -34,8 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" translate="no">
       <head>
+        <meta httpEquiv="Content-Language" content="ru" />
+        <meta name="language" content="Russian" />
+        <meta name="google" content="notranslate" />
         <meta name="theme-color" content="#1A56DB" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
