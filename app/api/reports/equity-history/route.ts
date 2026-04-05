@@ -19,7 +19,7 @@ function endOfMonth(year: number, month: number): Date {
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const now = new Date();

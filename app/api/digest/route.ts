@@ -9,7 +9,7 @@ import { generateDigestHtml } from "@/lib/email-templates/digest";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const data = await generateDigest(session.user.organizationId);
     const html = generateDigestHtml(data);
@@ -25,7 +25,7 @@ export async function GET() {
 export async function POST() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const sent = await sendDigestEmail(session.user.organizationId);
     return NextResponse.json({ sent });

@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
 
@@ -27,7 +27,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
     const body = (await req.json()) as {

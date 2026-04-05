@@ -18,7 +18,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const project = await prisma.project.findFirst({
@@ -54,7 +54,7 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const project = await prisma.project.findFirst({

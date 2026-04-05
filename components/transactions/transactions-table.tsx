@@ -118,14 +118,14 @@ export function TransactionsTable({
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-          aria-label="Select all"
+          aria-label="Выбрать все"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(v) => row.toggleSelected(!!v)}
-          aria-label="Select row"
+          aria-label="Выбрать строку"
         />
       ),
       size: 40,

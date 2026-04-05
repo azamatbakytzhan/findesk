@@ -9,7 +9,7 @@ import crypto from "crypto";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const invites = await prisma.invite.findMany({
@@ -27,7 +27,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
     }
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
     }

@@ -15,7 +15,7 @@ function endOfMonth(d: Date) {
 export async function GET(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
     const { searchParams } = new URL(req.url);
 
@@ -101,7 +101,7 @@ const createSchema = z.object({
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const body = await req.json();
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     const orgId = session.user.organizationId;
 
     const { searchParams } = new URL(req.url);

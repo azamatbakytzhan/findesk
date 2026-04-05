@@ -23,7 +23,7 @@ const createSchema = z.object({
 export async function GET(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
     const { searchParams } = new URL(req.url);
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const body = await req.json();
     const parsed = createSchema.safeParse(body);

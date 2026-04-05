@@ -8,7 +8,7 @@ import { notifyPaymentRequest } from "@/lib/telegram";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const requests = await prisma.paymentRequest.findMany({
       where:   { organizationId: session.user.organizationId },
@@ -26,7 +26,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
     const { amount, description, dueDate, categoryId, projectId } =

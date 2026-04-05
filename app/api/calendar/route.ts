@@ -27,7 +27,7 @@ function eachDayOf(start: Date, end: Date): Date[] {
 export async function GET(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
     const { searchParams } = new URL(req.url);

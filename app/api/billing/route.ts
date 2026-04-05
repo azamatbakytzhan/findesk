@@ -8,7 +8,7 @@ import { PLAN_LIMITS, type PlanKey } from "@/lib/plan-limits";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId = session.user.organizationId;
 
@@ -24,7 +24,7 @@ export async function GET() {
       }),
     ]);
 
-    if (!org) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!org) return NextResponse.json({ error: "Не найдено" }, { status: 404 });
 
     const PLAN_PRICES: Record<PlanKey, number> = { START: 0, BUSINESS: 29900, FIRST: 99900 };
 
@@ -44,7 +44,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

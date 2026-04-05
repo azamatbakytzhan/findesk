@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session)
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+      return new Response(JSON.stringify({ error: "Нет доступа" }), { status: 401 });
 
     const orgId   = session.user.organizationId;
     const orgName = session.user.orgName;

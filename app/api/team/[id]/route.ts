@@ -10,7 +10,7 @@ export async function PATCH(
 ) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
     }
@@ -54,7 +54,7 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
     if (session.user.role !== "OWNER" && session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
     }

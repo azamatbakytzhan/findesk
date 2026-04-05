@@ -7,7 +7,7 @@ import ExcelJS from "exceljs";
 export async function GET(req: Request) {
   try {
     const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     // Fetch data from the cashflow report API
     const { searchParams } = new URL(req.url);
