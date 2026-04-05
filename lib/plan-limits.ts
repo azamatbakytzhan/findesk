@@ -11,6 +11,7 @@ export interface PlanLimits {
   paymentApprovals: boolean;
   budgetModule:     boolean;
   apiAccess:        boolean;
+  balance:          boolean;
 }
 
 export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
@@ -25,6 +26,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
     paymentApprovals: false,
     budgetModule:     false,
     apiAccess:        false,
+    balance:          false,
   },
   BUSINESS: {
     maxUsers:         10,
@@ -37,6 +39,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
     paymentApprovals: true,
     budgetModule:     true,
     apiAccess:        false,
+    balance:          true,
   },
   FIRST: {
     maxUsers:         Infinity,
@@ -49,6 +52,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
     paymentApprovals: true,
     budgetModule:     true,
     apiAccess:        true,
+    balance:          true,
   },
 };
 

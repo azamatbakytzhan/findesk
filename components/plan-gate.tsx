@@ -41,6 +41,7 @@ const featureDescriptions: Partial<Record<keyof PlanLimits, string>> = {
   paymentApprovals: "Согласование платежей доступно на тарифе Business и выше.",
   budgetModule:     "Модуль бюджетирования доступен на тарифе Business и выше.",
   apiAccess:        "API-доступ доступен только на тарифе FIRST.",
+  balance:          "Балансовый отчёт доступен на тарифе Business и выше.",
 };
 
 export function PlanGate({ feature, children, fallback }: PlanGateProps) {
