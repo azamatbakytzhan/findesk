@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { streamText, tool } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { auth } from "@/lib/auth";
