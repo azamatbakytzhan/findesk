@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { InviteClient } from "./invite-client";
 
 export default async function InvitePage({

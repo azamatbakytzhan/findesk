@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { ApprovalsClient } from "./approvals-client";
 import { PlanGate } from "@/components/plan-gate";
 

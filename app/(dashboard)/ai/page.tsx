@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { AiChatPanel } from "@/components/ai/ai-chat-panel";
 import { PlanGate } from "@/components/plan-gate";
 
