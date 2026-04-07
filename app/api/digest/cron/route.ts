@@ -24,8 +24,8 @@ export async function GET(req: Request) {
     const failed = results.length - sent;
 
     return NextResponse.json({ processed: settings.length, sent, failed });
-  } catch (err) {
-    console.error("GET /api/digest/cron:", err);
+  } catch (error) {
+    console.error("GET /api/digest/cron:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

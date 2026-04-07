@@ -85,8 +85,8 @@ export async function GET(req: Request) {
       },
       period,
     });
-  } catch (err) {
-    console.error("GET /api/budgets:", err);
+  } catch (error) {
+    console.error("GET /api/budgets:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -136,8 +136,8 @@ export async function POST(req: Request) {
         });
 
     return NextResponse.json(budget, { status: 201 });
-  } catch (err) {
-    console.error("POST /api/budgets:", err);
+  } catch (error) {
+    console.error("POST /api/budgets:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -157,8 +157,8 @@ export async function DELETE(req: Request) {
 
     await prisma.budget.delete({ where: { id } });
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("DELETE /api/budgets:", err);
+  } catch (error) {
+    console.error("DELETE /api/budgets:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

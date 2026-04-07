@@ -42,8 +42,8 @@ export async function PATCH(
     });
 
     return NextResponse.json({ user: updated });
-  } catch (err) {
-    console.error("PATCH /api/team/[id]:", err);
+  } catch (error) {
+    console.error("PATCH /api/team/[id]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -77,8 +77,8 @@ export async function DELETE(
     await prisma.user.delete({ where: { id } });
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("DELETE /api/team/[id]:", err);
+  } catch (error) {
+    console.error("DELETE /api/team/[id]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

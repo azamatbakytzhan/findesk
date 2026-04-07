@@ -139,7 +139,7 @@ export function TransactionForm({
       });
       onOpenChange(false);
       onSuccess();
-    } catch (err) {
+    } catch (error) {
       toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsSubmitting(false);

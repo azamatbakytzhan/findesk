@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InlineCategorySelect } from "@/components/transactions/inline-category-select";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { Trash2, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
@@ -67,20 +66,6 @@ export function TransactionsTable({
   if (data !== localData && !isLoading) {
     setLocalData(data);
   }
-
-  const updateCategory = useCallback((txId: string, categoryId: string | null) => {
-    setLocalData((prev) =>
-      prev.map((tx) => {
-        if (tx.id !== txId) return tx;
-        if (!categoryId) return { ...tx, category: null };
-        const cat = categories.find((c) => c.id === categoryId);
-        return {
-          ...tx,
-          category: cat ? { id: cat.id, name: cat.name, color: null } : null,
-        };
-      })
-    );
-  }, [categories]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!confirm("Удалить транзакцию?")) return;
@@ -168,17 +153,14 @@ export function TransactionsTable({
     {
       accessorKey: "categoryId",
       header: "Категория",
-      cell: ({ row }) => (
-        <InlineCategorySelect
-          transaction={{
-            id: row.original.id,
-            type: row.original.type,
-            category: row.original.category,
-          }}
-          categories={categories}
-          onUpdate={(catId) => updateCategory(row.original.id, catId)}
-        />
-      ),
+      cell: ({ row }) =>
+        row.original.category ? (
+          <Badge variant="outline" className="text-xs font-normal">
+            {row.original.category.name}
+          </Badge>
+        ) : (
+          <span className="text-gray-400 text-xs">—</span>
+        ),
       size: 140,
     },
     {

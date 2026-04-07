@@ -79,8 +79,8 @@ export async function GET(req: Request) {
       equity,
       balanced: Math.abs(totalAssets - (totalLiabilities + equity)) < 0.01,
     });
-  } catch (err) {
-    console.error("GET /api/reports/balance error:", err);
+  } catch (error) {
+    console.error("GET /api/reports/balance error:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

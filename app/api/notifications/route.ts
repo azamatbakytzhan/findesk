@@ -18,8 +18,8 @@ export async function GET() {
     });
 
     return NextResponse.json({ settings });
-  } catch (err) {
-    console.error("GET /api/notifications:", err);
+  } catch (error) {
+    console.error("GET /api/notifications:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -43,8 +43,8 @@ export async function PATCH(req: Request) {
     });
 
     return NextResponse.json({ settings });
-  } catch (err) {
-    console.error("PATCH /api/notifications:", err);
+  } catch (error) {
+    console.error("PATCH /api/notifications:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

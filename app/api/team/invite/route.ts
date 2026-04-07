@@ -18,8 +18,8 @@ export async function GET() {
     });
 
     return NextResponse.json({ invites });
-  } catch (err) {
-    console.error("GET /api/team/invite:", err);
+  } catch (error) {
+    console.error("GET /api/team/invite:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -75,8 +75,8 @@ export async function POST(req: Request) {
     const inviteUrl = `${process.env.NEXTAUTH_URL ?? ""}/invite/${token}`;
 
     return NextResponse.json({ invite, inviteUrl });
-  } catch (err) {
-    console.error("POST /api/team/invite:", err);
+  } catch (error) {
+    console.error("POST /api/team/invite:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -97,8 +97,8 @@ export async function DELETE(req: Request) {
     await prisma.invite.deleteMany({ where: { id, organizationId: orgId } });
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("DELETE /api/team/invite:", err);
+  } catch (error) {
+    console.error("DELETE /api/team/invite:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

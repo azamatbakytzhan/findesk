@@ -33,8 +33,8 @@ export async function GET(
       orgName: org?.name ?? "Компания",
       role:    invite.role,
     });
-  } catch (err) {
-    console.error("GET /api/invite/[token]:", err);
+  } catch (error) {
+    console.error("GET /api/invite/[token]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -81,8 +81,8 @@ export async function POST(
     ]);
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("POST /api/invite/[token]:", err);
+  } catch (error) {
+    console.error("POST /api/invite/[token]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

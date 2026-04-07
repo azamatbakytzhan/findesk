@@ -39,8 +39,8 @@ export async function PATCH(
     });
 
     return NextResponse.json(updated);
-  } catch (err) {
-    console.error("PATCH /api/automation/[id]:", err);
+  } catch (error) {
+    console.error("PATCH /api/automation/[id]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -61,8 +61,8 @@ export async function DELETE(
 
     await prisma.automationRule.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("DELETE /api/automation/[id]:", err);
+  } catch (error) {
+    console.error("DELETE /api/automation/[id]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

@@ -35,8 +35,8 @@ export async function GET() {
       prices:      PLAN_PRICES,
       history,
     });
-  } catch (err) {
-    console.error("GET /api/billing:", err);
+  } catch (error) {
+    console.error("GET /api/billing:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -75,8 +75,8 @@ export async function POST(req: Request) {
     ]);
 
     return NextResponse.json({ plan: org.plan });
-  } catch (err) {
-    console.error("POST /api/billing:", err);
+  } catch (error) {
+    console.error("POST /api/billing:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

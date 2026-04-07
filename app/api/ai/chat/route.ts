@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session)
-      return new Response(JSON.stringify({ error: "Нет доступа" }), { status: 401 });
+      return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
 
     const orgId   = session.user.organizationId;
     const orgName = session.user.orgName;
@@ -268,9 +268,6 @@ export async function POST(req: Request) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error("POST /api/ai/chat error:", error);
-    return new Response(JSON.stringify({ error: "Ошибка ИИ-сервера" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ error: "Ошибка ИИ-сервера" }, { status: 500 });
   }
 }

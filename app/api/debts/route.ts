@@ -92,8 +92,8 @@ export async function GET(req: Request) {
         })),
       },
     });
-  } catch (err) {
-    console.error("GET /api/debts:", err);
+  } catch (error) {
+    console.error("GET /api/debts:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

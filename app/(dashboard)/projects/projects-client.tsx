@@ -129,7 +129,7 @@ export function ProjectsClient() {
       toast.success(isEdit ? "Проект обновлён" : "Проект создан");
       setSheetOpen(false);
       await fetchProjects();
-    } catch (err) {
+    } catch (error) {
       toast.error(err instanceof Error ? err.message : "Ошибка сервера");
     } finally {
       setIsSubmitting(false);
@@ -150,7 +150,7 @@ export function ProjectsClient() {
       }
       toast.success("Проект удалён");
       await fetchProjects();
-    } catch (err) {
+    } catch (error) {
       toast.error(err instanceof Error ? err.message : "Ошибка удаления");
     }
   }

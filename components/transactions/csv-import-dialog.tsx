@@ -72,7 +72,7 @@ export function CsvImportDialog({ open, onOpenChange, accounts, onSuccess }: Pro
 
         setPreview(json.preview);
         setTotalRows(json.total);
-      } catch (err) {
+      } catch (error) {
         toast.error(err instanceof Error ? err.message : "Проверьте формат CSV");
       } finally {
         setIsPreviewLoading(false);
@@ -107,7 +107,7 @@ export function CsvImportDialog({ open, onOpenChange, accounts, onSuccess }: Pro
       setFile(null);
       setPreview(null);
       onSuccess();
-    } catch (err) {
+    } catch (error) {
       toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsImporting(false);

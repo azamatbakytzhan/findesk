@@ -17,8 +17,8 @@ export async function GET() {
     });
 
     return NextResponse.json({ requests });
-  } catch (err) {
-    console.error("GET /api/approvals:", err);
+  } catch (error) {
+    console.error("GET /api/approvals:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -75,8 +75,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ request });
-  } catch (err) {
-    console.error("POST /api/approvals:", err);
+  } catch (error) {
+    console.error("POST /api/approvals:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

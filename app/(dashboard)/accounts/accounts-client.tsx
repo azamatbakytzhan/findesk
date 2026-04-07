@@ -89,7 +89,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
       setDialogOpen(false);
       setForm({ name: "", type: "BANK", currency: "KZT", balance: "0", color: "#1A56DB" });
       router.refresh();
-    } catch (err) {
+    } catch (error) {
       toast.error(err instanceof Error ? err.message : "Что-то пошло не так");
     } finally {
       setIsSubmitting(false);

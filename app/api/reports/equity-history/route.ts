@@ -88,8 +88,8 @@ export async function GET() {
     });
 
     return NextResponse.json({ points });
-  } catch (err) {
-    console.error("GET /api/reports/equity-history:", err);
+  } catch (error) {
+    console.error("GET /api/reports/equity-history:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

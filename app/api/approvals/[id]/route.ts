@@ -37,8 +37,8 @@ export async function PATCH(
     });
 
     return NextResponse.json({ request: updated });
-  } catch (err) {
-    console.error("PATCH /api/approvals/[id]:", err);
+  } catch (error) {
+    console.error("PATCH /api/approvals/[id]:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

@@ -17,3 +17,4 @@ export const prisma =
   });
 
 globalForPrisma.prisma = prisma;
+

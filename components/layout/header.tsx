@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,8 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, LogOut, Plus, Settings, User } from "lucide-react";
 import Link from "next/link";
-import { useQuickAdd } from "@/hooks/use-quick-add";
-import { QuickAddSheet } from "@/components/layout/quick-add-sheet";
 
 interface HeaderProps {
   orgName?: string;
@@ -24,8 +21,6 @@ interface HeaderProps {
 
 export function Header({ orgName }: HeaderProps) {
   const { data: session } = useSession();
-  const [quickAddOpen, setQuickAddOpen] = useState(false);
-  useQuickAdd(() => setQuickAddOpen(true));
 
   const initials = session?.user?.name
     ? session.user.name
@@ -49,13 +44,12 @@ export function Header({ orgName }: HeaderProps) {
         <Button
           size="sm"
           className="bg-[#1A56DB] hover:bg-[#1A56DB]/90 hidden sm:flex"
-          onClick={() => setQuickAddOpen(true)}
+          asChild
         >
-          <Plus className="w-4 h-4 mr-1.5" />
-          Добавить
-          <kbd className="ml-2 hidden lg:inline-flex items-center gap-0.5 rounded bg-blue-700 px-1.5 py-0.5 text-[10px] font-mono text-blue-200">
-            ⌘K
-          </kbd>
+          <Link href="/transactions/new">
+            <Plus className="w-4 h-4 mr-1.5" />
+            Добавить
+          </Link>
         </Button>
 
         <Button variant="ghost" size="icon" className="relative">
@@ -114,7 +108,6 @@ export function Header({ orgName }: HeaderProps) {
         </DropdownMenu>
       </div>
 
-      <QuickAddSheet open={quickAddOpen} onOpenChange={setQuickAddOpen} />
     </header>
   );
 }

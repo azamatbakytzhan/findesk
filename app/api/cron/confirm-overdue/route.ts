@@ -23,8 +23,8 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ overdue, checkedAt: new Date().toISOString() });
-  } catch (err) {
-    console.error("GET /api/cron/confirm-overdue:", err);
+  } catch (error) {
+    console.error("GET /api/cron/confirm-overdue:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

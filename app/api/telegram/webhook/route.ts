@@ -16,6 +16,15 @@ interface TelegramUpdate {
 }
 
 export async function POST(req: Request) {
+  // Верификация подписи Telegram через секретный токен
+  const secretToken = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (secretToken) {
+    const receivedToken = req.headers.get("x-telegram-bot-api-secret-token");
+    if (receivedToken !== secretToken) {
+      return NextResponse.json({ error: "Нет доступа" }, { status: 401 });
+    }
+  }
+
   try {
     const update = (await req.json()) as TelegramUpdate;
 
@@ -80,8 +89,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("POST /api/telegram/webhook:", err);
+  } catch (error) {
+    console.error("POST /api/telegram/webhook:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

@@ -29,8 +29,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
-  } catch (err) {
-    console.error("POST /api/onboarding:", err);
+  } catch (error) {
+    console.error("POST /api/onboarding:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

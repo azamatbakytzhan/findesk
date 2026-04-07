@@ -15,8 +15,8 @@ export async function GET() {
     const html = generateDigestHtml(data);
 
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-  } catch (err) {
-    console.error("GET /api/digest:", err);
+  } catch (error) {
+    console.error("GET /api/digest:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -29,8 +29,8 @@ export async function POST() {
 
     const sent = await sendDigestEmail(session.user.organizationId);
     return NextResponse.json({ sent });
-  } catch (err) {
-    console.error("POST /api/digest:", err);
+  } catch (error) {
+    console.error("POST /api/digest:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
