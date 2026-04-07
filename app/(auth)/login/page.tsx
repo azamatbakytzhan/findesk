@@ -45,7 +45,7 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error("Неверный email или пароль");
       } else {
-        router.push("/");
+        router.push("/dashboard");
         router.refresh();
       }
     } finally {
